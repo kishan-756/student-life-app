@@ -128,27 +128,32 @@
 
     const API = "https://dayflow-backend-opz7.onrender.com";
 
-async function register() {
-  const username = document.getElementById("rname").value.trim();
-  const email = document.getElementById("remail").value.trim();
-  const password = document.getElementById("rpass").value.trim();
+    async function register() {
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const password = document.getElementById("regPassword").value.trim();
+
+  if (!name || !email || !password) {
+    alert("Fill all fields");
+    return;
+  }
 
   const res = await fetch(`${API}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, email, password })
+    body: JSON.stringify({ name, email, password })
   });
 
   const data = await res.json();
 
   if (!res.ok) {
-    alert(data.msg || "Register failed");
+    alert(data.message || "Register failed");
     return;
   }
 
-  alert("Registered! Now login.");
-  showLogin();
+  alert("Registered successfully, now login");
 }
+
 
 
 async function login() {
