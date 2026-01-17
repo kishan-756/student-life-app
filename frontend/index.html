@@ -126,42 +126,53 @@
       document.getElementById("loginBox").style.display = "block";
     }
 
-    async function register() {
-      const name = rname.value;
-      const email = remail.value;
-      const password = rpass.value;
+    const API = "https://dayflow-backend-opz7.onrender.com";
 
-      const res = await fetch("https://dayflow-backend-opz7.onrender.com/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password })
-      });
+async function register() {
+  const username = document.getElementById("rname").value.trim();
+  const email = document.getElementById("remail").value.trim();
+  const password = document.getElementById("rpass").value.trim();
 
-      const data = await res.json();
-      alert(data.message);
-      showLogin(); // after register, go back to login
-    }
+  const res = await fetch(`${API}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, email, password })
+  });
 
-    async function login() {
-      const email = lemail.value;
-      const password = lpass.value;
+  const data = await res.json();
 
-      const res = await fetch("https://dayflow-backend-opz7.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
+  if (!res.ok) {
+    alert(data.msg || "Register failed");
+    return;
+  }
 
-      const data = await res.json();
+  alert("Registered! Now login.");
+  showLogin();
+}
 
-      if (res.ok) {
-        localStorage.setItem("username", data.name);
-        localStorage.setItem("userEmail", email);
-        window.location.href = "dashboard.html";
-      } else {
-        alert(data.message);
-      }
-    }
+
+async function login() {
+  const email = document.getElementById("lemail").value.trim();
+  const password = document.getElementById("lpass").value.trim();
+
+  const res = await fetch(`${API}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.msg || "Invalid email or password");
+    return;
+  }
+
+  localStorage.setItem("username", data.username);
+  localStorage.setItem("userEmail", data.email);
+  window.location.href = "dashboard.html";
+}
+
   </script>
 </body>
 </html>

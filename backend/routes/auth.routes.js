@@ -13,6 +13,10 @@ router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
     const existing = await User.findOne({ email });
     if (existing) {
       return res.status(400).json({ message: "User already exists" });
@@ -29,7 +33,11 @@ router.post("/register", async (req, res) => {
 
     await user.save();
 
-    res.status(201).json({ message: "User registered successfully 🎉" });
+    res.status(201).json({
+      message: "User registered successfully",
+      name: user.name,
+      email: user.email
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", err });
   }
@@ -37,25 +45,27 @@ router.post("/register", async (req, res) => {
 
 // Login route
 router.post("/login", async (req, res) => {
-    try {
-      const { email, password } = req.body;
-  
-      // Check user exists
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ message: "Invalid email or password" });
-      }
-  
-      // Compare password
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ message: "Invalid email or password" });
-      }
-  
-      res.json({ message: "Login successful 🎉", name: user.name });
-    } catch (err) {
-      res.status(500).json({ message: "Server error", err });
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
     }
-  });  
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    res.json({
+      message: "Login successful",
+      name: user.name,
+      email: user.email
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", err });
+  }
+});
 
 module.exports = router;
