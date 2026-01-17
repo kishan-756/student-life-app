@@ -101,9 +101,11 @@
     <!-- REGISTER -->
     <div id="registerBox" style="display:none;">
       <h3>Create Account</h3>
-      <input id="regname" placeholder="Name" />
-      <input id="regemail" placeholder="Email" />
-      <input id="regpass" type="password" placeholder="Password" />
+      <input id="rname" placeholder="Name" />
+      <input id="remail" placeholder="Email" />
+      <input id="rpass" type="password" placeholder="Password" />
+      <button onclick="testClick()">Create Account</button>
+
       <button onclick="register()">Register</button>
 
       <p style="margin-top:12px; font-size:13px; color:#a5b4fc; text-align:center;">
@@ -132,10 +134,10 @@
 
 
 
-async function register() {
-  const name = document.getElementById("regName").value.trim();
-  const email = document.getElementById("regEmail").value.trim();
-  const password = document.getElementById("regPassword").value.trim();
+    async function register() {
+  const name = document.getElementById("rname").value.trim();
+  const email = document.getElementById("remail").value.trim();
+  const password = document.getElementById("rpass").value.trim();
 
   if (!name || !email || !password) {
     alert("Fill all fields");
@@ -156,7 +158,9 @@ async function register() {
   }
 
   alert("Registered successfully, now login");
+  showLogin();
 }
+
 
 
 
@@ -181,6 +185,9 @@ async function login() {
   localStorage.setItem("username", data.username);
   localStorage.setItem("userEmail", data.email);
   window.location.href = "dashboard.html";
+}
+function testClick() {
+  alert("Register button clicked");
 }
 
   </script>
