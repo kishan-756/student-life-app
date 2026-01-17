@@ -10,10 +10,7 @@
       color: #e5e7eb;
     }
 
-    .app {
-      display: flex;
-      height: 100vh;
-    }
+    .app { display: flex; height: 100vh; }
 
     .sidebar {
       width: 220px;
@@ -22,15 +19,8 @@
       background: linear-gradient(180deg, #020617, #2e1065);
     }
 
-    .sidebar h2 {
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: 1px;
-    }
-
-    .sidebar p {
-      color: #c7d2fe;
-    }
+    .sidebar h2 { margin: 0; font-size: 22px; letter-spacing: 1px; }
+    .sidebar p { color: #c7d2fe; }
 
     .sidebar button {
       display: block;
@@ -45,9 +35,7 @@
       transition: 0.2s ease;
     }
 
-    .sidebar button:hover {
-      background: rgba(255,255,255,0.18);
-    }
+    .sidebar button:hover { background: rgba(255,255,255,0.18); }
 
     .sidebar button.active {
       background: linear-gradient(90deg, #7c3aed, #4c1d95);
@@ -73,13 +61,8 @@
       text-align: center;
     }
 
-    .header h1 {
-      color: white;
-    }
-
-    .header p {
-      color: #a5b4fc;
-    }
+    .header h1 { color: white; }
+    .header p { color: #a5b4fc; }
 
     .box {
       background: #020617;
@@ -99,8 +82,7 @@
       border: 1px solid #1e293b;
     }
 
-    #taskList li,
-    #expenseList li {
+    #taskList li, #expenseList li {
       background: #020617;
       padding: 8px 10px;
       border-radius: 10px;
@@ -147,32 +129,6 @@
       <div id="expenseSection" class="box" style="display:none;">
         <h2>Expense Tracker</h2>
         <h3 id="balance">Balance: 0</h3>
-        <canvas id="expenseChart" width="400" height="200"></canvas>
-
-        <select id="monthFilter" onchange="fetchExpenses()">
-          <option value="">All</option>
-          <option value="01">Jan</option>
-          <option value="02">Feb</option>
-          <option value="03">Mar</option>
-          <option value="04">Apr</option>
-          <option value="05">May</option>
-          <option value="06">Jun</option>
-          <option value="07">Jul</option>
-          <option value="08">Aug</option>
-          <option value="09">Sep</option>
-          <option value="10">Oct</option>
-          <option value="11">Nov</option>
-          <option value="12">Dec</option>
-        </select>
-
-        <select id="yearFilter" onchange="fetchExpenses()">
-          <option value="">All Years</option>
-          <option value="2024">2024</option>
-          <option value="2025">2025</option>
-          <option value="2026">2026</option>
-        </select>
-
-        <br><br>
 
         <input id="amt" type="number" placeholder="Amount" />
         <input id="note" placeholder="Note" />
@@ -200,6 +156,8 @@
       localStorage.clear();
       window.location.href = "index.html";
     }
+
+    // -------- TO-DO --------
 
     async function fetchTasks() {
       const res = await fetch(`${API}/api/tasks/${userEmail}`);
@@ -263,9 +221,11 @@
       fetchTasks();
     }
 
+    // -------- EXPENSE --------
+
     async function fetchExpenses() {
       const res = await fetch(`${API}/api/expenses/${userEmail}`);
-      let data = await res.json();
+      const data = await res.json();
 
       const list = document.getElementById("expenseList");
       list.innerHTML = "";
@@ -275,15 +235,47 @@
       data.forEach(e => {
         const li = document.createElement("li");
         li.className = e.type;
+
         if (e.type === "income") income += e.amount;
         else expense += e.amount;
 
         li.innerText = `${e.date} - ${e.note} : ${e.amount}`;
+
+        const delBtn = document.createElement("button");
+        delBtn.innerText = "Delete";
+        delBtn.onclick = () => deleteExpense(e._id);
+
+        li.appendChild(delBtn);
         list.appendChild(li);
       });
 
       document.getElementById("balance").innerText =
         `Income: ${income} | Expense: ${expense} | Balance: ${income - expense}`;
+    }
+
+    async function addExpense() {
+      const amount = Number(amt.value);
+      const noteText = note.value.trim();
+      const type = etype.value;
+      const date = edate.value;
+
+      if (!amount || !noteText || !date) return;
+
+      await fetch(`${API}/api/expenses`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, note: noteText, type, userEmail, date })
+      });
+
+      amt.value = "";
+      note.value = "";
+      edate.value = "";
+      fetchExpenses();
+    }
+
+    async function deleteExpense(id) {
+      await fetch(`${API}/api/expenses/${id}`, { method: "DELETE" });
+      fetchExpenses();
     }
 
     function showSection(name) {
