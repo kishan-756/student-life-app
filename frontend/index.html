@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DayFlow</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #020617, #2e1065);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+
+    .card {
+      background: #020617;
+      padding: 30px 40px;
+      border-radius: 16px;
+      width: 320px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      color: white;
+      letter-spacing: 1px;
+    }
+
+    .brand p {
+      margin: 6px 0 0;
+      color: #a5b4fc;
+      font-size: 14px;
+    }
+
+    h3 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      color: #c7d2fe;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 10px;
+      background: #020617;
+      color: white;
+      border: 1px solid #1e293b;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(90deg, #7c3aed, #4c1d95);
+      color: white;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 12px rgba(124,58,237,0.8);
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">
+      <h1>DayFlow</h1>
+      <p>Manage your day, master your life.</p>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginBox">
+      <h3>Login</h3>
+      <input id="lemail" placeholder="Email" />
+      <input id="lpass" type="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+
+      <p style="margin-top:12px; font-size:13px; color:#a5b4fc; text-align:center;">
+        New user?
+        <span style="color:#7c3aed; cursor:pointer;" onclick="showRegister()">
+          Create account
+        </span>
+      </p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerBox" style="display:none;">
+      <h3>Create Account</h3>
+      <input id="rname" placeholder="Name" />
+      <input id="remail" placeholder="Email" />
+      <input id="rpass" type="password" placeholder="Password" />
+      <button onclick="register()">Register</button>
+
+      <p style="margin-top:12px; font-size:13px; color:#a5b4fc; text-align:center;">
+        Already have an account?
+        <span style="color:#7c3aed; cursor:pointer;" onclick="showLogin()">
+          Login
+        </span>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function showRegister() {
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("registerBox").style.display = "block";
+    }
+
+    function showLogin() {
+      document.getElementById("registerBox").style.display = "none";
+      document.getElementById("loginBox").style.display = "block";
+    }
+
+    async function register() {
+      const name = rname.value;
+      const email = remail.value;
+      const password = rpass.value;
+
+      const res = await fetch("http://localhost:3001/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      showLogin(); // after register, go back to login
+    }
+
+    async function login() {
+      const email = lemail.value;
+      const password = lpass.value;
+
+      const res = await fetch("http://localhost:3001/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem("username", data.name);
+        localStorage.setItem("userEmail", email);
+        window.location.href = "dashboard.html";
+      } else {
+        alert(data.message);
+      }
+    }
+  </script>
+</body>
+</html>

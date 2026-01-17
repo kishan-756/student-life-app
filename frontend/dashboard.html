@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <style>
+    body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  padding: 20px;
+  color: white;
+  background: linear-gradient(180deg, #020617, #2e1065);
+}
+
+.sidebar h2 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 1px;
+}
+
+.sidebar p {
+  color: #c7d2fe;
+}
+
+.sidebar button {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+  padding: 10px;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.sidebar button:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+.sidebar button.active {
+  background: linear-gradient(90deg, #7c3aed, #4c1d95);
+  box-shadow: 0 0 14px rgba(124,58,237,0.9);
+}
+
+.main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #020617;
+}
+
+.header {
+  background: #020617;
+  padding: 18px 22px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+
+.header h1 {
+  color: white;
+}
+
+.header p {
+  color: #a5b4fc;
+}
+
+.box {
+  background: #020617;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+input, select, button {
+  padding: 8px 12px;
+  margin: 4px;
+  border-radius: 10px;
+  background: #020617;
+  color: white;
+  border: 1px solid #1e293b;
+}
+
+#taskList li,
+#expenseList li {
+  background: #020617;
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin: 6px 0;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.income {
+  color: #4ade80;
+}
+
+.expense {
+  color: #f87171;
+}
+
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+  }
+
+  .sidebar button {
+    flex: 1;
+  }
+}
+
+
+  </style>
+</head>
+<body>
+    <body>
+        <div class="app">
+          <div class="sidebar">
+            <h2>DayFlow</h2>
+<p style="font-size:12px; color:#94a3b8; margin-top:2px;">Manage your day</p>
+
+            <button id="todoBtn" onclick="showSection('todo')">To-Do</button>
+<button id="expenseBtn" onclick="showSection('expense')">Expense</button>
+<button onclick="logout()">Logout</button>
+
+          </div>
+      
+          <div class="main">
+            <div class="header">
+                <h1 style="margin:0;">DayFlow</h1>
+                <p style="margin:4px 0 0; color:#a5b4fc; font-size:14px;">
+                  Manage your day, master your life.
+                </p>
+              </div>
+              
+              
+              
+      
+            <div id="todoSection" class="box">
+              <h2>To-Do List</h2>
+              <input id="taskInput" placeholder="Enter a task" />
+              <input id="dateInput" type="date" />
+              <button onclick="addTask()">Add</button>
+              <ul id="taskList"></ul>
+            </div>
+      
+            <div id="expenseSection" class="box" style="display:none;">
+              <h2>Expense Tracker</h2>
+      
+              <h3 id="balance">Balance: 0</h3>
+              <canvas id="expenseChart" width="400" height="200"></canvas>
+      
+              <select id="monthFilter" onchange="fetchExpenses()">
+                <option value="">All</option>
+                <option value="01">Jan</option>
+                <option value="02">Feb</option>
+                <option value="03">Mar</option>
+                <option value="04">Apr</option>
+                <option value="05">May</option>
+                <option value="06">Jun</option>
+                <option value="07">Jul</option>
+                <option value="08">Aug</option>
+                <option value="09">Sep</option>
+                <option value="10">Oct</option>
+                <option value="11">Nov</option>
+                <option value="12">Dec</option>
+              </select>
+      
+              <select id="yearFilter" onchange="fetchExpenses()">
+                <option value="">All Years</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+              </select>
+      
+              <br><br>
+      
+              <input id="amt" type="number" placeholder="Amount" />
+              <input id="note" placeholder="Note" />
+              <select id="etype">
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+              <input id="edate" type="date" />
+              <button onclick="addExpense()">Add</button>
+      
+              <ul id="expenseList"></ul>
+            </div>
+          </div>
+        </div>
+      
+  <script>
+    const name = localStorage.getItem("username");
+    const userEmail = localStorage.getItem("userEmail");
+
+
+    if (!name) {
+      window.location.href = "index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("username");
+      window.location.href = "index.html";
+    }
+
+    // ---------------- TO-DO ----------------
+
+    async function fetchTasks() {
+      const res = await fetch(`http://localhost:3001/api/tasks/${userEmail}`);
+      const tasks = await res.json();
+
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+
+      tasks.forEach(task => {
+        const li = document.createElement("li");
+
+        const span = document.createElement("span");
+        span.innerText = task.text;
+
+        if (task.completed) {
+          span.style.textDecoration = "line-through";
+          span.style.color = "gray";
+        }
+
+        if (!task.completed && task.deadline) {
+          const today = new Date().toISOString().split("T")[0];
+          if (today > task.deadline) {
+            span.style.color = "red";
+          }
+        }
+
+        const dateSpan = document.createElement("span");
+        dateSpan.className = "deadline";
+        if (task.deadline) {
+          const today = new Date().toISOString().split("T")[0];
+          if (!task.completed && today > task.deadline) {
+            dateSpan.innerText = "(Overdue: " + task.deadline + ")";
+            dateSpan.style.color = "red";
+          } else {
+            dateSpan.innerText = "(Due: " + task.deadline + ")";
+          }
+        }
+
+        const doneBtn = document.createElement("button");
+        doneBtn.innerText = task.completed ? "Undo" : "Done";
+        doneBtn.onclick = () => toggleTask(task._id, !task.completed);
+
+        const editBtn = document.createElement("button");
+        editBtn.innerText = "Edit";
+        editBtn.onclick = () => editTask(task._id, task.text);
+
+        const delBtn = document.createElement("button");
+        delBtn.innerText = "Delete";
+        delBtn.onclick = () => deleteTask(task._id);
+
+        li.appendChild(span);
+        li.appendChild(dateSpan);
+        li.appendChild(doneBtn);
+        li.appendChild(editBtn);
+        li.appendChild(delBtn);
+        list.appendChild(li);
+      });
+    }
+
+    async function addTask() {
+      const text = taskInput.value.trim();
+      const deadline = dateInput.value;
+      if (text === "") return;
+
+      await fetch("http://localhost:3001/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, userEmail, deadline })
+      });
+
+      taskInput.value = "";
+      dateInput.value = "";
+      fetchTasks();
+    }
+
+    async function deleteTask(id) {
+      await fetch(`http://localhost:3001/api/tasks/${id}`, { method: "DELETE" });
+      fetchTasks();
+    }
+
+    async function toggleTask(id, newStatus) {
+      await fetch(`http://localhost:3001/api/tasks/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completed: newStatus })
+      });
+      fetchTasks();
+    }
+
+    async function editTask(id, oldText) {
+      const newText = prompt("Edit task:", oldText);
+      if (!newText || newText.trim() === "") return;
+
+      await fetch(`http://localhost:3001/api/tasks/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: newText.trim() })
+      });
+      fetchTasks();
+    }
+
+    // ---------------- EXPENSE ----------------
+
+    async function fetchExpenses() {
+  const res = await fetch(`http://localhost:3001/api/expenses/${userEmail}`);
+  let data = await res.json();
+
+  const selectedMonth = document.getElementById("monthFilter").value;
+
+  // month filter
+  if (selectedMonth) {
+    data = data.filter(e => e.date.split("-")[1] === selectedMonth);
+  }
+
+  const selectedYear = document.getElementById("yearFilter").value;
+
+if (selectedYear) {
+  data = data.filter(e => e.date.split("-")[0] === selectedYear);
+}
+
+  const list = document.getElementById("expenseList");
+  list.innerHTML = "";
+
+  let incomeTotal = 0;
+  let expenseTotal = 0;
+
+  data.forEach(e => {
+    const li = document.createElement("li");
+    li.className = e.type;
+
+    if (e.type === "income") incomeTotal += e.amount;
+    else expenseTotal += e.amount;
+
+    li.innerText = `${e.date} - ${e.note} : ${e.amount}`;
+
+    const delBtn = document.createElement("button");
+    delBtn.innerText = "Delete";
+    delBtn.onclick = () => deleteExpense(e._id);
+
+    li.appendChild(delBtn);
+    list.appendChild(li);
+  });
+
+  const balance = incomeTotal - expenseTotal;
+
+  document.getElementById("balance").innerText =
+    `Income: ${incomeTotal} | Expense: ${expenseTotal} | Balance: ${balance}`;
+
+    drawChart(incomeTotal, expenseTotal);
+
+}
+
+function drawChart(income, expense) {
+  const canvas = document.getElementById("expenseChart");
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const max = Math.max(income, expense, 1);
+
+  const incomeHeight = (income / max) * 150;
+  const expenseHeight = (expense / max) * 150;
+
+  // Income bar
+  ctx.fillStyle = "green";
+  ctx.fillRect(80, 180 - incomeHeight, 60, incomeHeight);
+  ctx.fillText("Income", 80, 195);
+
+  // Expense bar
+  ctx.fillStyle = "red";
+  ctx.fillRect(200, 180 - expenseHeight, 60, expenseHeight);
+  ctx.fillText("Expense", 200, 195);
+
+  ctx.fillStyle = "black";
+  ctx.fillText(income, 85, 180 - incomeHeight - 5);
+  ctx.fillText(expense, 205, 180 - expenseHeight - 5);
+}
+
+    async function addExpense() {
+      const amount = Number(amt.value);
+      const noteText = document.getElementById("note").value.trim();
+      const type = etype.value;
+      const date = edate.value;
+
+      if (!amount || !noteText || !date) return;
+
+      await fetch("http://localhost:3001/api/expenses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, note: noteText, type, userEmail, date })
+      });
+
+      amt.value = "";
+      document.getElementById("note").value = "";
+      edate.value = "";
+      fetchExpenses();
+    }
+
+    async function deleteExpense(id) {
+      await fetch(`http://localhost:3001/api/expenses/${id}`, { method: "DELETE" });
+      fetchExpenses();
+    }
+    function showSection(name) {
+  const todoSec = document.getElementById("todoSection");
+  const expSec = document.getElementById("expenseSection");
+
+  const todoBtn = document.getElementById("todoBtn");
+  const expBtn = document.getElementById("expenseBtn");
+
+  if (name === "todo") {
+    todoSec.style.display = "block";
+    expSec.style.display = "none";
+
+    todoBtn.classList.add("active");
+    expBtn.classList.remove("active");
+  } else {
+    todoSec.style.display = "none";
+    expSec.style.display = "block";
+
+    expBtn.classList.add("active");
+    todoBtn.classList.remove("active");
+  }
+}
+// set current month by default
+const now = new Date();
+const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
+document.getElementById("monthFilter").value = currentMonth;
+
+
+
+
+showSection("todo");
+    fetchTasks();
+    fetchExpenses();
+  </script>
+</body>
+</html>
